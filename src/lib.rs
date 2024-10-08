@@ -1,6 +1,6 @@
 // Copyright 2019 Octavian Oncescu
 
-#![no_std]
+// #![no_std]
 
 //! A drop-in global allocator wrapper around the [mimalloc](https://github.com/microsoft/mimalloc) allocator.
 //! Mimalloc is a general purpose, performance oriented allocator built by Microsoft.
@@ -48,6 +48,8 @@ pub struct MiMalloc;
 unsafe impl GlobalAlloc for MiMalloc {
     #[inline]
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        let alloc = layout.size();
+        print!("alloc: {}", alloc);
         mi_malloc_aligned(layout.size(), layout.align()) as *mut u8
     }
 
@@ -57,7 +59,10 @@ unsafe impl GlobalAlloc for MiMalloc {
     }
 
     #[inline]
-    unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+        let dealloc = layout.size();
+        print!("dealloc: {}", dealloc);
+
         mi_free(ptr as *mut c_void);
     }
 
